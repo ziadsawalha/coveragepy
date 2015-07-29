@@ -1,0 +1,100 @@
+* Release checklist
+
+- Test on:
+    - Windows
+    - Ubuntu
+    - Mac
+    - Pythons 2.6, 2.7, 3.3, 3.4
+- Version number in coverage/version.py
+    - 3.1a1, 3.1b1, 3.1c1, 3.1
+- Copyright date in coverage/__init__.py
+- Update CHANGES.txt, including release date.
+- Update docstring in setup.py, including "New in x.y:"
+- Update docs
+    - Version, date, and changes in doc/changes.rst
+    - Version and date in doc/index.rst
+    - Version and copyright date in doc/conf.py
+    - Version --version output in doc/install.rst
+    - Don't forget the man page: doc/python-coverage.1.txt
+    - Generate new sample_html to get the latest, incl footer version number:
+        pip install -e .
+        cd ~/cog/trunk
+        rm -rf htmlcov
+        TODO: this isn't right with the new cog
+            coverage run --branch --source=cogapp -m cogapp.test_cogapp CogTestsInMemory
+        coverage html
+        - IF BETA:
+            cp -r htmlcov/ ~/coverage/trunk/doc/sample_html_beta/
+        - ELSE:
+            cp -r htmlcov/ ~/coverage/trunk/doc/sample_html/
+    - IF BETA:
+        - Build and publish docs:
+            $ make publishbeta
+    - ELSE:
+        - Build and publish docs:
+            $ make publish
+- Kits:
+    - Source kit:
+        - $ make kit
+    - Windows .exe for each Python
+        - $ tox -c tox_winkits.ini
+- Update PyPi:
+    - $ make pypi
+    - upload the kits:
+        - $ make kit_upload
+        - $ tox -c tox_winkits.ini upload
+        # note: this seems to try to upload each file twice, so you'll have a
+        # successful upload, then a failure, but the file gets there.
+    - Visit http://pypi.python.org/pypi?%3Aaction=pkg_edit&name=coverage :
+        - show/hide the proper versions.
+- Tag the tree
+    - hg tag -m "Coverage 3.0.1" coverage-3.0.1
+- Update nedbatchelder.com
+    - Edit webfaction.htaccess to make sure the proper versions are mapped to /beta
+    - Blog post?
+- Update readthedocs
+- Update bitbucket:
+    - Issue tracker should get new version number in picker.
+    # Note: don't delete old version numbers: it marks changes on the tickets
+    # with that number.
+- Update github:
+    - hg bookmark -r default master -f && hg push github
+- Announce on coveragepy-announce@googlegroups.com .
+- Announce on TIP.
+- Ask Christophe Zwerschke (cito@online.de) to build win64 kits.
+
+
+* Building
+
+- Install fixtar on any Windows Python used to make source kits: http://bitbucket.org/ned/fixtar
+- Create PythonXX\Lib\distutils\distutils.cfg::
+    [build]
+    compiler = mingw32
+
+* Testing
+
+- Testing of Python code is handled by tox.
+    - Create a virtualenv
+    - install tox into it
+    - activate the virtualenv
+    - $ tox
+
+- For complete coverage testing:
+
+    $ make metacov
+
+    This will run coverage under its own measurement.  You can do this in
+    different environments (Linux vs. Windows, for example), then copy the
+    data files (.coverage.meta.*) to one machine for combination and
+    reporting.  To combine and report:
+
+    $ make metahtml
+
+- For testing on Python <= 2.4:
+
+    - Set up the Python as your current python, probably with a virtualenv.
+    - $ . ./test_old.sh
+
+- To run the Javascript tests:
+
+    open tests/js/index.html in variety of browsers.

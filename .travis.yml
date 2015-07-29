@@ -1,0 +1,27 @@
+# Tell Travis what to do
+# https://travis-ci.org/nedbat/coveragepy
+
+language: python
+
+python:
+  - 2.6
+  - 2.7
+  - 3.3
+  - 3.4
+  - pypy
+
+install:
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2; fi
+  - python setup.py clean develop
+
+before_script:
+  - pwd
+  - ls -l
+  - coverage debug sys
+  - if [[ $TRAVIS_PYTHON_VERSION == 'pypy' ]]; then export COVERAGE_NO_EXTENSION=1; fi
+
+script:
+  - python igor.py zip_mods install_egg
+  - python igor.py test_with_tracer c
+  - python igor.py remove_extension
+  - python igor.py test_with_tracer py
